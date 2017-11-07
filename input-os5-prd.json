@@ -1,0 +1,19 @@
+{
+  "Tags": [
+  ],
+  "Parameters": [
+    {
+      "ParameterKey": "vpcClassBOctet",
+      "ParameterValue": "10"
+    },
+    {
+      "ParameterKey": "availabilityZones",
+      "ParameterValue": "us-west-2a, us-west-2b, us-west-2c"
+    }
+  ],
+  "DisableRollback": false,
+  "TimeoutInMinutes": 20,
+  "Capabilities": [
+    "CAPABILITY_IAM"
+  ]
+}

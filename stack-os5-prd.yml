@@ -1,0 +1,342 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: OS5 Production VPC - CF template
+Parameters:
+  vpcClassBOctet:
+    Description: The Class B Octet of the VPC CIDR - (e.g. 10 in 10.10.0.0/16)
+    Type: String
+  availabilityZones:
+    Description: Comma Seperated list of 3 Availaibity Zones
+    Type: CommaDelimitedList
+    Default: us-west-2a, us-west-2b, us-west-2c
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock:
+        Fn::Join:
+        - ''
+        - - '10.'
+          - Ref: vpcClassBOctet
+          - ".0.0/16"
+      InstanceTenancy: default
+      EnableDnsSupport: true
+      EnableDnsHostnames: false
+      Tags:
+      - Key: Name
+        Value:
+          Ref: AWS::StackName
+  PubSubnetELBAppA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['0', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.1.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags:
+      - Key: Name
+        Value: sn_os5-prd-app-elb-a
+  PubSubnetELBAppB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['1', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.2.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags: 
+      - Key: Name
+        Value: sn_os5-prd-app-elb-b
+  PubSubnetELBAppC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['2', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.3.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags: 
+      - Key: Name
+        Value: sn_os5-prd-app-elb-c
+  PubSubnetELBWebA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['0', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.10.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags: 
+      - Key: Name
+        Value: sn_os5-prd-web-elb-a
+  PubSubnetELBWebB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['1', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.20.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags: 
+      - Key: Name
+        Value: sn_os5-prd-web-elb-b
+  PubSubnetELBWebC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['2', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.30.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags: 
+      - Key: Name
+        Value: sn_os5-prd-web-elb-c
+  # Private subnets
+  PriSubnetEC2AppA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['0', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.101.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags: 
+      - Key: Name
+        Value: sn_os5-prd-app-ec2-a
+  PriSubnetEC2AppB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['1', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.102.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags: 
+      - Key: Name
+        Value: sn_os5-prd-app-ec2-b
+  PriSubnetEC2AppC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['2', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.103.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags: 
+      - Key: Name
+        Value: sn_os5-prd-app-ec2-c
+  PriSubnetEC2WebA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['0', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.110.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags: 
+      - Key: Name
+        Value: sn_os5-prd-web-ec2-a
+  PriSubnetEC2WebB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['1', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.120.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags: 
+      - Key: Name
+        Value: sn_os5-prd-web-ec2-a
+  PriSubnetEC2WebC:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone:
+        Fn::Select: ['2', Ref: availabilityZones]
+      VpcId: !Ref 'VPC'
+      CidrBlock:
+        Fn::Join: ['', ['10.', Ref: vpcClassBOctet, '.130.0/24']]
+      MapPublicIpOnLaunch: false
+      Tags: 
+      - Key: Name
+        Value: sn_os5-prd-web-ec2-a
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: igw_os5-prd
+  GatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
+  NatGateway:
+    DependsOn: GatewayAttachment
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+        - EIP
+        - AllocationId
+      SubnetId:
+        Ref: PubSubnetELBWebA
+      Tags:
+      - Key: Name
+        Value: nat_os5-prd
+  EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+      Tags: 
+      - Key: Name
+        Value: rt_os5-prd-pub
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: GatewayAttachment
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref 'InternetGateway'
+  PubRouteTableAssocAA:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PublicRouteTable'
+      SubnetId: !Ref 'PubSubnetELBAppA'
+  PubRouteTableAssocAB:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PublicRouteTable'
+      SubnetId: !Ref 'PubSubnetELBAppB'
+  PubRouteTableAssocAC:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PublicRouteTable'
+      SubnetId: !Ref 'PubSubnetELBAppC'
+  PubRouteTableAssocWA:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PublicRouteTable'
+      SubnetId: !Ref 'PubSubnetELBWebA'
+  PubRouteTableAssocWB:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PublicRouteTable'
+      SubnetId: !Ref 'PubSubnetELBWebB'
+  PubRouteTableAssocWC:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PublicRouteTable'
+      SubnetId: !Ref 'PubSubnetELBWebC'
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+      Tags: 
+      - Key: Name
+        Value: rt_os5-prd-pri
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    DependsOn: NatGateway
+    Properties:
+      RouteTableId: !Ref 'PrivateRouteTable'
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref 'NatGateway'
+  PriRouteTableAssocAA:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PrivateRouteTable'
+      SubnetId: !Ref 'PriSubnetEC2AppA'
+  PriRouteTableAssocAB:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PrivateRouteTable'
+      SubnetId: !Ref 'PriSubnetEC2AppB'
+  PriRouteTableAssocAC:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PrivateRouteTable'
+      SubnetId: !Ref 'PriSubnetEC2AppC'
+  PriRouteTableAssocWA:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PrivateRouteTable'
+      SubnetId: !Ref 'PriSubnetEC2WebA'
+  PriRouteTableAssocWB:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PrivateRouteTable'
+      SubnetId: !Ref 'PriSubnetEC2WebB'
+  PriRouteTableAssocWC:
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref 'PrivateRouteTable'
+      SubnetId: !Ref 'PriSubnetEC2WebC'
+Outputs:
+  vpcId:
+    Description: VPC
+    Value:
+      Ref: VPC
+  SubnetELBAppA:
+    Description: Subnet to be set on ELB App AZ-A
+    Value:
+      Ref: PubSubnetELBAppA
+  SubnetELBAppB:
+    Description: Subnet to be set on ELB App AZ-B
+    Value:
+      Ref: PubSubnetELBAppB
+  SubnetELBAppC:
+    Description: Subnet to be set on ELB App AZ-C
+    Value:
+      Ref: PubSubnetELBAppC
+  SubnetELBWebA:
+    Description: Subnet to be set on ELB Web AZ-A
+    Value:
+      Ref: PubSubnetELBWebA
+  SubnetELBWebB:
+    Description: Subnet to be set on ELB Web AZ-B
+    Value:
+      Ref: PubSubnetELBWebB
+  SubnetELBWebC:
+    Description: Subnet to be set on ELB Web AZ-C
+    Value:
+      Ref: PubSubnetELBWebC
+  SubnetEC2AppA:
+    Description: Subnet to be set on EC2 App AZ-A
+    Value:
+      Ref: PriSubnetEC2AppA
+  SubnetEC2AppB:
+    Description: Subnet to be set on EC2 App AZ-B
+    Value:
+      Ref: PriSubnetEC2AppB
+  SubnetEC2AppC:
+    Description: Subnet to be set on EC2 App AZ-C
+    Value:
+      Ref: PriSubnetEC2AppC
+  SubnetEC2WebA:
+    Description: Subnet to be set on EC2 Web AZ-A
+    Value:
+      Ref: PriSubnetEC2WebA
+  SubnetEC2WebB:
+    Description: Subnet to be set on EC2 Web AZ-B
+    Value:
+      Ref: PriSubnetEC2WebB
+  SubnetEC2WebC:
+    Description: Subnet to be set on EC2 Web AZ-C
+    Value:
+      Ref: PriSubnetEC2WebC
